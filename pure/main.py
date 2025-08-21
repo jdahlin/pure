@@ -40,8 +40,18 @@ def check_file(filename: str | Path) -> list[Message]:
 
 
 def print_file_analysis(file_path: str | Path) -> None:
-    for msg in check_file(file_path):
-        print(msg)
+    file_path = Path(file_path)
+    if file_path.is_dir():
+        for sub_path in sorted(file_path.rglob("*.py")):
+            # Skip hidden files and directories
+            parts = sub_path.relative_to(file_path).parts
+            if any(part.startswith('.') or part == '__pycache__' for part in parts):
+                continue
+            for msg in check_file(sub_path):
+                print(msg)
+    else:
+        for msg in check_file(file_path):
+            print(msg)
 
 
 if __name__ == "__main__":
