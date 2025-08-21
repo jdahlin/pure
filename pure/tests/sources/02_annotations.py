@@ -33,7 +33,7 @@ def comment_body(n: int) -> int:
     return n
 
 
-def comment_before(n: int) -> int: # pragma: pure
+def comment_before(n: int) -> int:  # pragma: pure
     global bad
     return n
 

@@ -1,2 +1,27 @@
-[tool.pytest.ini_options]
-addopts = '-vv'
+[build-system]
+requires = ["hatchling>=1.0.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pure"
+version = "0.1.0"
+description = "Purity checker for Python code. See https://github.com/jdahlin/pure"
+authors = [
+    { name = "Johan Dahlin", email = "johan@dahlin.net" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/jdahlin/pure"
+Repository = "https://github.com/jdahlin/pure"
+
+# Optional: If you want to specify dependencies, add them here
+# dependencies = [
+#     "somepackage>=1.0.0"
+# ]
+
+# Optional: If you want to customize uv behavior, add a [tool.uv] section
+# [tool.uv]
+# ...

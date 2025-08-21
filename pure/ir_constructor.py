@@ -15,7 +15,7 @@ from pure.builtins import pure_builtins
 class IRConstructor(ast.NodeVisitor):
     def __init__(self, path: pathlib.Path, source: str) -> None:
         super().__init__()
-        self.source_lines = [''] + source.splitlines()
+        self.source_lines = [""] + source.splitlines()
         self.path = path
         self.local_vars = set()
         self.args = {}
@@ -62,10 +62,10 @@ class IRConstructor(ast.NodeVisitor):
             node.name, self.current_class, Loc.from_node(self.path, node)
         )
         doc_string = ast.get_docstring(node)
-        if doc_string and ('@pure' in doc_string or ':pure: true' in doc_string):
+        if doc_string and ("@pure" in doc_string or ":pure: true" in doc_string):
             self.current_function_ref.is_pure_marked = True
         for line in [node.lineno, node.lineno + 1]:
-            if '# pragma: pure' in self.source_lines[line]:
+            if "# pragma: pure" in self.source_lines[line]:
                 self.current_function_ref.is_pure_marked = True
 
         for stmt in node.body:

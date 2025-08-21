@@ -12,6 +12,7 @@ def parse(source: str) -> Loc:
     location = Loc.from_node(Path("test.py"), tree.body[0])
     return location
 
+
 def test_loc_from_node() -> None:
     loc = parse("""def hello():
     print("Hello, world!")

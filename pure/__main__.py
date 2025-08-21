@@ -7,4 +7,3 @@ if __name__ == "__main__":
         sys.exit(1)
     for file_path in sys.argv[1:]:
         print_file_analysis(file_path)
-
