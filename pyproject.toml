@@ -14,7 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
 ]
-version = "0.2.1"
+version = "0.3.0"
 description = "Purity validator for Python code."
 authors = [
     { name = "Johan Dahlin", email = "jdahlin@gmail.com" }
@@ -34,6 +34,10 @@ pure-validator = "pure_validator.__main__:main"
 dev = [
     "ruff>=0.12.10",
 ]
+flake8 = ["flake8>=7.3.0"]
+
+[project.entry-points."flake8.extension"]
+PUR = "pure_validator.flake8_plugin:PureFlake8Plugin"
 
 [tool.ruff]
 target-version = "py312"
@@ -41,7 +45,6 @@ line-length = 88
 extend-exclude = ["__pycache__"]
 
 [tool.ruff.lint]
-# Fairly strict selection based on Ruff's suggested "strict" profile (minus docstrings for now).
 select = [
     "E","F","I","B","UP","N","YTT","S","BLE","A","C4","DTZ","T10",
     "EM","ERA","FA","ISC","ICN","G","INP","PIE","T20","PT","Q","RET","SLF",
@@ -49,15 +52,8 @@ select = [
 ]
 # Temporary ignores to reduce initial noise; can be tightened later.
 ignore = [
-    "N999"  # invalid module name
-#    "PLR0912", # too many branches
-#    "PLR0913", # too many arguments
-#    "PLR0915", # too many statements
-#    "PLR2004", # magic value comparisons
-#    "S101",    # asserts allowed in tests / simple validation
-#    "TRY003",  # long exception messages fine for now
-#    "ARG001",  # unused function argument (will revisit)
-#    "ARG002",  # unused method argument
+    "N999",  # invalid module name
+    "PLR2004",  # magic constant
 ]
 
 [tool.ruff.lint.per-file-ignores]

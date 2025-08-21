@@ -21,6 +21,14 @@ Running the purity checker, will report an error similar to:
 example.py:3: Function 'impure_function' is marked as pure but has side effects (print statement)
 ```
 
+There is also a [flake8](https://flake8.pycqa.org/) plugin available that can be used to check purity violations in your codebase.
+
+```bash
+$ flake8 --select PURE file-or-directory
+```
+
+For more information on using flake8, you can refer to the official [flake8](https://flake8.pycqa.org/) documentation.
+
 ## Features
 - Recursively analyzes Python files in directories
 - Reports purity violations and messages
