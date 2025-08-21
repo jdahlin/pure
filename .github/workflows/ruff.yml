@@ -1,0 +1,39 @@
+name: Ruff Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ruff-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ruff:
+    name: ruff (py312)
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false || github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Ruff
+        run: pip install --upgrade pip && pip install ruff
+
+      - name: Ruff check
+        run: ruff check . --output-format=github
+
+      - name: Ruff format (check only)
+        run: ruff format --check .
