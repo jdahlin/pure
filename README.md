@@ -8,6 +8,19 @@ Purity validator for Python code.
 
 Pure validator is a static analysis tool for checking the purity of Python functions and modules. It analyzes Python source code and reports on side effects, global state usage, and other purity-related concerns.
 
+Suppose you have the following code:
+
+```python
+def impure_function(): # pragma: pure
+    print("This is impure!")
+```
+
+Running the purity checker, will report an error similar to:
+
+```
+example.py:3: Function 'impure_function' is marked as pure but has side effects (print statement)
+```
+
 ## Features
 - Recursively analyzes Python files in directories
 - Reports purity violations and messages
@@ -19,42 +32,17 @@ Pure validator is a static analysis tool for checking the purity of Python funct
 You can install Pure via pip:
 
 ```bash
-pip install pure_validator
+$ pip install pure-validator
 ```
 
 ## Usage
 
 ### Command Line
 
-Analyze a single file:
 
 ```bash
-python -mpure_validator path/to/file.py
+$ pure-validator file-or-directory
 ```
-
-Analyze all Python files in a directory (recursively):
-
-```bash
-python -mpure_validator path/to/directory
-```
-
-### As a Library
-
-You can also use Pure programmatically:
-
-```python
-from pure_validator.main import check_file
-
-messages = check_file("path/to/file.py")
-for msg in messages:
-    print(msg)
-```
-
-## Project Structure
-
-- `pure_validator/` - Main source code
-- `pure_validator/tests/` - Test suite
-- `pyproject.toml` - Project metadata and build configuration
 
 ## Contributing
 
@@ -63,4 +51,3 @@ Contributions are welcome! Please open issues or pull requests on [GitHub](https
 ## License
 
 This project is licensed under the terms of the license found in the `LICENSE` file.
-

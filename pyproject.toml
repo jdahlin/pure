@@ -26,3 +26,6 @@ requires-python = ">=3.12"
 [project.urls]
 Homepage = "https://github.com/jdahlin/pure"
 Repository = "https://github.com/jdahlin/pure"
+
+[project.scripts]
+pure-validator = "pure_validator.__main__:main"
