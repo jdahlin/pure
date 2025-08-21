@@ -3,24 +3,17 @@ bad = 0
 
 def prop_true(n: int) -> int:
     global bad
-    bad += 1
     return n
 
 
 prop_true.pure = True
 
 
-def prop_false(n: int) -> int:
-    return n
-
-
-prop_false.pure = False
-
-
 def doc_string(n: int) -> int:
     """
     @pure
     """
+    global bad
     return n
 
 
@@ -30,18 +23,24 @@ def doc_string2(n: int) -> int:
     :pure: true
     :return:
     """
+    global bad
     return n
 
 
 def comment_body(n: int) -> int:
-    # @pure
+    # pragma: pure
+    global bad
     return n
 
 
-# @pure
-def comment_before(n: int) -> int:
+def comment_before(n: int) -> int: # pragma: pure
+    global bad
     return n
 
 
 # Expected:
 # 5:4: Function 'prop_true' uses global variable 'bad'
+# 16:4: Function 'doc_string' uses global variable 'bad'
+# 26:4: Function 'doc_string2' uses global variable 'bad'
+# 32:4: Function 'comment_body' uses global variable 'bad'
+# 37:4: Function 'comment_before' uses global variable 'bad'

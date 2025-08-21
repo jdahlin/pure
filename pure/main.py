@@ -27,7 +27,7 @@ def check_file(filename: str | Path) -> list[Message]:
 
     # Pass 1: AST -> IR
     tree = ast.parse(source, filename=str(file_path))
-    ir_constructor = IRConstructor(file_path)
+    ir_constructor = IRConstructor(file_path, source=source)
     ir_constructor.visit(tree)
     module = ir_constructor.module
 

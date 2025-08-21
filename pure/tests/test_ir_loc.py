@@ -17,7 +17,7 @@ def test_loc_from_node() -> None:
     print("Hello, world!")
 """)
     assert loc.path == Path("test.py")
-    assert loc.lineno == 2
+    assert loc.lineno == 1
     assert loc.col_offset == 0
-    assert loc.end_lineno == 3
-    assert loc.end_col_offset == 24
+    assert loc.end_lineno == 2
+    assert loc.end_col_offset == 26

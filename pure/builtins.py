@@ -40,6 +40,7 @@ pure_builtins = [
     "next",
     "object",
     "oct",
+    # "open" can be made pure if stream is specified
     "ord",
     "pow",
     "property",
