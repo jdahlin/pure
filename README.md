@@ -1,4 +1,4 @@
-# Pure
+# Pure validator
 
 Purity validator for Python code.
 
