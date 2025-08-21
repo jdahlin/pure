@@ -1,6 +1,6 @@
-from pure.builtins import pure_builtins
-from pure.ir import Loc, Module, FunctionCall, FunctionReference, VariableReference
-from pure.message import Message
+from pure_validator.builtins import pure_builtins
+from pure_validator.ir import Loc, Module, FunctionCall, FunctionReference, VariableReference
+from pure_validator.message import Message
 
 
 class PurityChecker:

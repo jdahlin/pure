@@ -3,8 +3,8 @@ import tokenize
 
 import pytest
 
-from pure.main import check_file
-from pure.message import Message
+from pure_validator.main import check_file
+from pure_validator.message import Message
 
 sources_dir = pathlib.Path(__file__).parent / "sources"
 

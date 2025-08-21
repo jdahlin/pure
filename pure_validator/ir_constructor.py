@@ -1,7 +1,7 @@
 import ast
 import pathlib
 
-from pure.ir import (
+from pure_validator.ir import (
     Loc,
     Module,
     Class,
@@ -9,7 +9,7 @@ from pure.ir import (
     FunctionReference,
     VariableReference,
 )
-from pure.builtins import pure_builtins
+from pure_validator.builtins import pure_builtins
 
 
 class IRConstructor(ast.NodeVisitor):

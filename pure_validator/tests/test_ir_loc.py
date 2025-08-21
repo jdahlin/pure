@@ -4,7 +4,7 @@
 import ast
 from pathlib import Path
 
-from pure.ir import Loc
+from pure_validator.ir import Loc
 
 
 def parse(source: str) -> Loc:

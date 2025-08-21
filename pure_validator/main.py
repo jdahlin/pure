@@ -2,9 +2,9 @@ import ast
 import tokenize
 from pathlib import Path
 
-from pure.ir_constructor import IRConstructor
-from pure.message import Message
-from pure.purity_checker import PurityChecker
+from pure_validator.ir_constructor import IRConstructor
+from pure_validator.message import Message
+from pure_validator.purity_checker import PurityChecker
 
 
 class PureError(Exception):

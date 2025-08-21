@@ -1,5 +1,5 @@
 import sys
-from pure.main import print_file_analysis
+from pure_validator.main import print_file_analysis
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
