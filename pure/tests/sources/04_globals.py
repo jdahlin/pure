@@ -1,6 +1,3 @@
-import os
-import sys
-
 global_var: int = 10
 
 
@@ -29,4 +26,4 @@ def f(n: int) -> int:
 f.pure = True
 
 # Expected:
-# 20:4: Function 'f' calls non-pure function 'impure_func'
+# 22:4: Function 'f' calls non-pure function 'impure_func'
