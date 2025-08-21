@@ -9,8 +9,7 @@ from pure_validator.ir import Loc
 
 def parse(source: str) -> Loc:
     tree = ast.parse(source, filename="test.py")
-    location = Loc.from_node(Path("test.py"), tree.body[0])
-    return location
+    return Loc.from_node(Path("test.py"), tree.body[0])
 
 
 def test_loc_from_node() -> None:

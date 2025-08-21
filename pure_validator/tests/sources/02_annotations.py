@@ -2,7 +2,7 @@ bad = 0
 
 
 def prop_true(n: int) -> int:
-    global bad
+    global bad  # noqa: PLW0602
     return n
 
 
@@ -13,7 +13,7 @@ def doc_string(n: int) -> int:
     """
     @pure
     """
-    global bad
+    global bad  # noqa: PLW0602
     return n
 
 
@@ -23,18 +23,18 @@ def doc_string2(n: int) -> int:
     :pure: true
     :return:
     """
-    global bad
+    global bad  # noqa: PLW0602
     return n
 
 
 def comment_body(n: int) -> int:
-    # pragma: pure
-    global bad
+    # pragma: pure # noqa: ERA001
+    global bad  # noqa: PLW0602
     return n
 
 
 def comment_before(n: int) -> int:  # pragma: pure
-    global bad
+    global bad  # noqa: PLW0602
     return n
 
 

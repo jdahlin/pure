@@ -11,7 +11,9 @@ sources_dir = pathlib.Path(__file__).parent / "sources"
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if "path" in metafunc.fixturenames:
-        test_files = sorted(sources_dir.glob("*.py"))
+        test_files = sorted(
+            f for f in sources_dir.glob("*.py") if f.name != "__init__.py"
+        )
         metafunc.parametrize("path", test_files, ids=[f.stem for f in test_files])
 
 
@@ -19,7 +21,7 @@ def parse_expected_message(source: str, path: pathlib.Path) -> list[Message]:
     lines = source.splitlines()
     messages: list[Message] = []
     header = False
-    for lineno, line in enumerate(lines, start=1):
+    for line in lines:
         if line == "# Expected:":
             header = True
             continue
@@ -31,7 +33,7 @@ def parse_expected_message(source: str, path: pathlib.Path) -> list[Message]:
                     path=path,
                     lineno=int(lineno),
                     col_offset=int(col_offset),
-                )
+                ),
             )
 
     return messages

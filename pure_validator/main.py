@@ -18,7 +18,8 @@ class PureError(Exception):
 def check_file(filename: str | Path) -> list[Message]:
     file_path = Path(filename)
     if not file_path.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
+        msg = f"File not found: {file_path}"
+        raise FileNotFoundError(msg)
 
     # Use tokenize.open() to handle different encodings, sometimes
     # specified as a leading '# -*- coding: utf-8 -*-' comment
@@ -34,9 +35,7 @@ def check_file(filename: str | Path) -> list[Message]:
     # Pass 2: IR -> Purity Check
     purity_checker = PurityChecker(module)
     purity_checker.check()
-    messages = purity_checker.messages
-
-    return messages
+    return purity_checker.messages
 
 
 def print_file_analysis(file_path: str | Path) -> None:
@@ -48,17 +47,18 @@ def print_file_analysis(file_path: str | Path) -> None:
             if any(part.startswith(".") or part == "__pycache__" for part in parts):
                 continue
             for msg in check_file(sub_path):
-                print(msg)
+                print(msg)  # noqa: T201
     else:
         for msg in check_file(file_path):
-            print(msg)
+            print(msg)  # noqa: T201
 
 
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <file_path>")
+    MIN_ARGS = 2
+    if len(sys.argv) < MIN_ARGS:
+        print("Usage: python main.py <file_path>")  # noqa: T201
         sys.exit(1)
 
     print_file_analysis(sys.argv[1])

@@ -35,12 +35,18 @@ class Module:
     classes: dict[str, "Class"] = dataclasses.field(default_factory=dict)
 
     def get_or_create_function_ref(
-        self, name: str, class_: "Class | None" = None, location: Loc | None = None
+        self,
+        name: str,
+        class_: "Class | None" = None,
+        location: Loc | None = None,
     ) -> "FunctionReference":
         full_key = f"{class_.name}.{name}" if class_ else name
         if full_key not in self.functions:
             self.functions[full_key] = FunctionReference(
-                name=name, module=self, class_=class_, loc=location
+                name=name,
+                module=self,
+                class_=class_,
+                loc=location,
             )
         return self.functions[full_key]
 
@@ -50,7 +56,9 @@ class Module:
         return self.classes[name]
 
     def should_check_function(
-        self, name: str, current_class: "Class | None" = None
+        self,
+        name: str,
+        current_class: "Class | None" = None,
     ) -> bool:
         full_key = f"{current_class.name}.{name}" if current_class else name
         if full_key in self.functions:

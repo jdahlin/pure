@@ -1,5 +1,11 @@
 from pure_validator.builtins import pure_builtins
-from pure_validator.ir import Loc, Module, FunctionCall, FunctionReference, VariableReference
+from pure_validator.ir import (
+    FunctionCall,
+    FunctionReference,
+    Loc,
+    Module,
+    VariableReference,
+)
 from pure_validator.message import Message
 
 
@@ -21,7 +27,7 @@ class PurityChecker:
                 path=location.path,
                 lineno=location.lineno,
                 col_offset=location.col_offset,
-            )
+            ),
         )
 
     def get_function_key(self, func_ref: FunctionReference) -> str:
@@ -50,7 +56,7 @@ class PurityChecker:
 
     def _analyze_function_purity(self, func_ref: FunctionReference) -> bool:
         return self._check_function_calls(func_ref) and self._check_global_variables(
-            func_ref
+            func_ref,
         )
 
     def _check_function_calls(self, func_ref: FunctionReference) -> bool:
@@ -60,7 +66,9 @@ class PurityChecker:
         return True
 
     def _is_function_call_pure(
-        self, caller: FunctionReference, func_call: FunctionCall
+        self,
+        caller: FunctionReference,
+        func_call: FunctionCall,
     ) -> bool:
         called_func = func_call.function_ref
         called_key = self.get_function_key(called_func)
@@ -87,24 +95,31 @@ class PurityChecker:
         return True
 
     def _report_impure_call(
-        self, caller: FunctionReference, func_call: FunctionCall, reason: str
+        self,
+        caller: FunctionReference,
+        func_call: FunctionCall,
+        reason: str,
     ) -> None:
         if func_call.loc:
             self.append_message(
                 location=func_call.loc,
-                message=f"Function '{caller.name}' calls {reason} '{func_call.function_ref.name}'",
+                message=f"Function '{caller.name}' calls {reason} "
+                f"'{func_call.function_ref.name}'",
             )
 
     def _report_global_variable_usage(
-        self, func_ref: FunctionReference, var_ref: VariableReference
+        self,
+        func_ref: FunctionReference,
+        var_ref: VariableReference,
     ) -> None:
         if var_ref.loc:
             self.append_message(
                 location=var_ref.loc,
-                message=f"Function '{func_ref.name}' uses global variable '{var_ref.name}'",
+                message=f"Function '{func_ref.name}' uses global variable "
+                f"'{var_ref.name}'",
             )
 
     def check(self) -> None:
-        for func_name, func_ref in self.module.functions.items():
+        for func_ref in self.module.functions.values():
             if func_ref.is_pure_marked:
                 self.check_function_purity(func_ref)

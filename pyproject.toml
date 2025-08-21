@@ -29,3 +29,46 @@ Repository = "https://github.com/jdahlin/pure"
 
 [project.scripts]
 pure-validator = "pure_validator.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.12.10",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = ["__pycache__"]
+
+[tool.ruff.lint]
+# Fairly strict selection based on Ruff's suggested "strict" profile (minus docstrings for now).
+select = [
+    "E","F","I","B","UP","N","YTT","S","BLE","A","C4","DTZ","T10",
+    "EM","ERA","FA","ISC","ICN","G","INP","PIE","T20","PT","Q","RET","SLF",
+    "SIM","TID","TCH","ARG","PTH","PD","PL","TRY","RUF","PERF","FURB"
+]
+# Temporary ignores to reduce initial noise; can be tightened later.
+ignore = [
+    "N999"  # invalid module name
+#    "PLR0912", # too many branches
+#    "PLR0913", # too many arguments
+#    "PLR0915", # too many statements
+#    "PLR2004", # magic value comparisons
+#    "S101",    # asserts allowed in tests / simple validation
+#    "TRY003",  # long exception messages fine for now
+#    "ARG001",  # unused function argument (will revisit)
+#    "ARG002",  # unused method argument
+]
+
+[tool.ruff.lint.per-file-ignores]
+"pure_validator/__init__.py" = ["F401"]
+"pure_validator/tests/*" = ["S101","PLR2004","ARG001","ARG002"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+addopts = "-vv"
