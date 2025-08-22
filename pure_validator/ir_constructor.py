@@ -6,10 +6,24 @@ from pure_validator.ir import (
     Class,
     FunctionCall,
     FunctionReference,
-    Loc,
     Module,
     VariableReference,
 )
+from pure_validator.message import Loc
+
+
+def is_global(
+    name: str,
+    local_vars: set[str],
+    args: dict[str, str | None],
+) -> bool:
+    if name in pure_builtins:
+        return False
+    return name not in local_vars and name not in args
+
+
+def is_pure_builtin(name: str) -> bool:
+    return name in pure_builtins
 
 
 class IRConstructor(ast.NodeVisitor):
@@ -29,22 +43,9 @@ class IRConstructor(ast.NodeVisitor):
             module=self.module,
             function=self.current_function_ref,
             class_=self.current_class,
-            is_global=self.is_global(name, self.local_vars, self.args),
+            is_global=is_global(name, self.local_vars, self.args),
             loc=Loc.from_node(self.path, node),
         )
-
-    def is_global(
-        self,
-        name: str,
-        local_vars: set[str],
-        args: dict[str, str | None],
-    ) -> bool:
-        if name in pure_builtins:
-            return False
-        return name not in local_vars and name not in args
-
-    def is_pure_builtin(self, name: str) -> bool:
-        return name in pure_builtins
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         old_class = self.current_class
@@ -82,12 +83,11 @@ class IRConstructor(ast.NodeVisitor):
     def visit_Assign(self, node: ast.Assign) -> None:
         for target in node.targets:
             match target:
-                case ast.Name() as name:
-                    if self.current_function_ref:
-                        self.local_vars.add(name.id)
-                        var_ref = self.get_or_create_variable_ref(name.id, name)
-                        if var_ref not in self.current_function_ref.variables:
-                            self.current_function_ref.variables.append(var_ref)
+                case ast.Name() as name if func := self.current_function_ref:
+                    self.local_vars.add(name.id)
+                    var_ref = self.get_or_create_variable_ref(name.id, name)
+                    if var_ref not in func.variables:
+                        func.variables.append(var_ref)
                 case ast.Attribute(ast.Name() as obj_name, attr="pure"):
                     func_ref = self.module.get_or_create_function_ref(
                         obj_name.id,
@@ -100,7 +100,7 @@ class IRConstructor(ast.NodeVisitor):
         if (
             isinstance(node.ctx, ast.Load)
             and self.current_function_ref
-            and not self.is_pure_builtin(node.id)
+            and not is_pure_builtin(node.id)
             and node.id not in self.module.functions
         ):
             var_ref = self.get_or_create_variable_ref(node.id, node)
@@ -108,29 +108,28 @@ class IRConstructor(ast.NodeVisitor):
                 self.current_function_ref.variables.append(var_ref)
 
     def visit_Call(self, node: ast.Call) -> None:
-        if self.current_function_ref:
-            func_name = None
-            if isinstance(node.func, ast.Name):
-                func_name = node.func.id
-            elif isinstance(node.func, ast.Attribute) and isinstance(
-                node.func.value,
-                ast.Name,
-            ):
-                func_name = f"{node.func.value.id}.{node.func.attr}"
-            if func_name and not self.is_pure_builtin(func_name):
-                called_func_ref = self.module.get_or_create_function_ref(func_name)
+        if func := self.current_function_ref:
+            match node.func:
+                case ast.Name() as name:
+                    func_name = name.id
+                case ast.Attribute(attr=ast.Name()):
+                    func_name = f"{node.func.value.id}.{node.func.attr}"
+                case _:
+                    func_name = None
+            if func_name and not is_pure_builtin(func_name):
                 func_call = FunctionCall(
-                    function_ref=called_func_ref,
+                    function_ref=self.module.get_or_create_function_ref(func_name),
                     loc=Loc.from_node(self.path, node),
                 )
-                if func_call not in self.current_function_ref.funcs:
-                    self.current_function_ref.funcs.append(func_call)
+                if func_call not in func.calls:
+                    func.calls.append(func_call)
         self.generic_visit(node)
 
     def visit_Global(self, node: ast.Global) -> None:
         for name in node.names:
-            if self.current_function_ref:
-                var_ref = self.get_or_create_variable_ref(name, node)
-                var_ref.is_global = True
-                if var_ref not in self.current_function_ref.variables:
-                    self.current_function_ref.variables.append(var_ref)
+            if not (func := self.current_function_ref):
+                continue
+            var_ref = self.get_or_create_variable_ref(name, node)
+            var_ref.is_global = True
+            if var_ref not in func.variables:
+                func.variables.append(var_ref)

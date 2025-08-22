@@ -4,7 +4,7 @@ import tokenize
 import pytest
 
 from pure_validator.main import check_file
-from pure_validator.message import Message
+from pure_validator.message import Loc, Message
 
 sources_dir = pathlib.Path(__file__).parent / "sources"
 
@@ -30,9 +30,7 @@ def parse_expected_message(source: str, path: pathlib.Path) -> list[Message]:
             messages.append(
                 Message(
                     message=message[1:],
-                    path=path,
-                    lineno=int(lineno),
-                    col_offset=int(col_offset),
+                    loc=Loc(path=path, lineno=int(lineno), col_offset=int(col_offset)),
                 ),
             )
 

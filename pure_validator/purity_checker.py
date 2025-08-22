@@ -1,12 +1,11 @@
-from pure_validator.builtins import pure_builtins
 from pure_validator.ir import (
     FunctionCall,
     FunctionReference,
-    Loc,
     Module,
     VariableReference,
 )
-from pure_validator.message import Message
+from pure_validator.ir_constructor import is_pure_builtin
+from pure_validator.message import Loc, Message
 
 
 class PurityChecker:
@@ -17,25 +16,13 @@ class PurityChecker:
         self.pure_functions: set[str] = set()
         self.call_stack: set[str] = set()
 
-    def is_pure_builtin(self, name: str) -> bool:
-        return name in pure_builtins
-
-    def append_message(self, *, location: Loc, message: str) -> None:
-        self.messages.append(
-            Message(
-                message=message,
-                path=location.path,
-                lineno=location.lineno,
-                col_offset=location.col_offset,
-            ),
-        )
+    def msg(self, message: str, *, loc: Loc) -> None:
+        self.messages.append(Message(message=message, loc=loc))
 
     def get_function_key(self, func_ref: FunctionReference) -> str:
-        return (
-            f"{func_ref.class_.name}.{func_ref.name}"
-            if func_ref.class_
-            else func_ref.name
-        )
+        if func_ref.class_ is not None:
+            return f"{func_ref.class_.name}.{func_ref.name}"
+        return func_ref.name
 
     def check_function_purity(self, func_ref: FunctionReference) -> bool:
         func_key = self.get_function_key(func_ref)
@@ -60,7 +47,7 @@ class PurityChecker:
         )
 
     def _check_function_calls(self, func_ref: FunctionReference) -> bool:
-        for func_call in func_ref.funcs:
+        for func_call in func_ref.calls:
             if not self._is_function_call_pure(func_ref, func_call):
                 return False
         return True
@@ -72,7 +59,7 @@ class PurityChecker:
     ) -> bool:
         called_func = func_call.function_ref
         called_key = self.get_function_key(called_func)
-        if self.is_pure_builtin(called_func.name):
+        if is_pure_builtin(called_func.name):
             return True
         if not called_func.is_pure_marked and called_key not in self.module.functions:
             self._report_impure_call(caller, func_call, "impure function")
@@ -87,12 +74,13 @@ class PurityChecker:
         return True
 
     def _check_global_variables(self, func_ref: FunctionReference) -> bool:
+        lacks_globals = True
         for var_ref in func_ref.variables:
-            if self.is_pure_builtin(var_ref.name) or not var_ref.is_global:
+            if is_pure_builtin(var_ref.name) or not var_ref.is_global:
                 continue
             self._report_global_variable_usage(func_ref, var_ref)
-            return False
-        return True
+            lacks_globals = False
+        return lacks_globals
 
     def _report_impure_call(
         self,
@@ -100,24 +88,24 @@ class PurityChecker:
         func_call: FunctionCall,
         reason: str,
     ) -> None:
-        if func_call.loc:
-            self.append_message(
-                location=func_call.loc,
-                message=f"Function '{caller.name}' calls {reason} "
-                f"'{func_call.function_ref.name}'",
-            )
+        if not func_call.loc:
+            return
+        self.msg(
+            f"Function '{caller.name}' calls {reason} '{func_call.function_ref.name}'",
+            loc=func_call.loc,
+        )
 
     def _report_global_variable_usage(
         self,
         func_ref: FunctionReference,
         var_ref: VariableReference,
     ) -> None:
-        if var_ref.loc:
-            self.append_message(
-                location=var_ref.loc,
-                message=f"Function '{func_ref.name}' uses global variable "
-                f"'{var_ref.name}'",
-            )
+        if not var_ref.loc:
+            return
+        self.msg(
+            f"Function '{func_ref.name}' uses global variable '{var_ref.name}'",
+            loc=var_ref.loc,
+        )
 
     def check(self) -> None:
         for func_ref in self.module.functions.values():
