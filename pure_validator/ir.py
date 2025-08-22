@@ -2,6 +2,7 @@ import dataclasses
 import pathlib
 
 from pure_validator.message import Loc
+from pure_validator.purity_types import PuritySource, PurityStatus
 
 
 @dataclasses.dataclass
@@ -64,6 +65,8 @@ class FunctionReference:
     variables: list["VariableReference"] = dataclasses.field(default_factory=list)
     is_pure_marked: bool = False
     loc: Loc | None = None
+    purity_status: PurityStatus = PurityStatus.UNKNOWN
+    purity_source: PuritySource = PuritySource.UNKNOWN
 
 
 @dataclasses.dataclass
@@ -74,3 +77,5 @@ class VariableReference:
     class_: Class | None = None
     is_global: bool = False
     loc: Loc | None = None
+    from_global_stmt: bool = False
+

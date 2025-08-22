@@ -10,6 +10,7 @@ from pure_validator.ir import (
     VariableReference,
 )
 from pure_validator.message import Loc
+from pure_validator.purity_types import PuritySource
 
 
 def is_global(
@@ -70,9 +71,11 @@ class IRConstructor(ast.NodeVisitor):
         doc_string = ast.get_docstring(node)
         if doc_string and ("@pure" in doc_string or ":pure: true" in doc_string):
             self.current_function_ref.is_pure_marked = True
+            self.current_function_ref.purity_source = PuritySource.USER_MARK
         for line in [node.lineno, node.lineno + 1]:
             if "# pragma: pure" in self.source_lines[line]:
                 self.current_function_ref.is_pure_marked = True
+                self.current_function_ref.purity_source = PuritySource.USER_MARK
 
         for stmt in node.body:
             self.visit(stmt)
@@ -94,6 +97,7 @@ class IRConstructor(ast.NodeVisitor):
                         self.current_class,
                     )
                     func_ref.is_pure_marked = True
+                    func_ref.purity_source = PuritySource.USER_MARK
         self.visit(node.value)
 
     def visit_Name(self, node: ast.Name) -> None:
@@ -132,5 +136,6 @@ class IRConstructor(ast.NodeVisitor):
                 continue
             var_ref = self.get_or_create_variable_ref(name, node)
             var_ref.is_global = True
+            var_ref.from_global_stmt = True
             if var_ref not in func.variables:
                 func.variables.append(var_ref)
