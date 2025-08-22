@@ -64,4 +64,4 @@ class PureFlake8Plugin:
                 code = m.code
             else:
                 code = f"{self.CODE_PREFIX}000"
-            yield (m.line, m.col, f"{code} {m.text}", type(self))
+            yield m.line, m.col, f"{code} {m.text}", type(self)
